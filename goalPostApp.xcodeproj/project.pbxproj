@@ -58,9 +58,12 @@
 		B19183F324D83ED5008CE7FD /* goalPostApp */ = {
 			isa = PBXGroup;
 			children = (
+				B191840F24D84EDB008CE7FD /* Extensions */,
+				B191840E24D84ED4008CE7FD /* Enums */,
+				B191840C24D84EBB008CE7FD /* Views */,
+				B191840B24D84EA8008CE7FD /* Controller */,
 				B19183F424D83ED5008CE7FD /* AppDelegate.swift */,
 				B19183F624D83ED5008CE7FD /* SceneDelegate.swift */,
-				B19183F824D83ED5008CE7FD /* ViewController.swift */,
 				B19183FA24D83ED5008CE7FD /* Main.storyboard */,
 				B191840024D83ED8008CE7FD /* Assets.xcassets */,
 				B191840224D83ED8008CE7FD /* LaunchScreen.storyboard */,
@@ -68,6 +71,35 @@
 				B19183FD24D83ED5008CE7FD /* goalPostApp.xcdatamodeld */,
 			);
 			path = goalPostApp;
+			sourceTree = "<group>";
+		};
+		B191840B24D84EA8008CE7FD /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				B19183F824D83ED5008CE7FD /* ViewController.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		B191840C24D84EBB008CE7FD /* Views */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B191840E24D84ED4008CE7FD /* Enums */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Enums;
+			sourceTree = "<group>";
+		};
+		B191840F24D84EDB008CE7FD /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
