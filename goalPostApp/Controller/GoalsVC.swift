@@ -14,22 +14,56 @@ let appDelegate = UIApplication.shared.delegate as? AppDelegate
 class GoalsVC: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var goalStatus: UILabel! // tells us if a goal is added or removed
+    @IBOutlet weak var undoBtn: UIButton!
+    @IBOutlet weak var undoLbl: UILabel!
+    
+    func undoButtonHidden() {
+        goalStatus.isHidden = true
+        undoBtn.isHidden = true
+        undoLbl.isHidden = true
+    }
+    
+    func undoButtonShown() {
+        goalStatus.isHidden = false
+        undoBtn.isHidden = false
+        undoLbl.isHidden = false
+    }
     
     var goals: [Goal] = []
+    var tempGoalDescription: String! = ""
+    var tempGoalType: String! = ""
+    var tempCompletionVal: Int32 = 0
+    var tempProgress: Int32 = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
         tableView.isHidden = false
+        undoButtonHidden()
     }
+    
+    @IBAction func undoBtnPressed(_ sender: Any) {
+        print("In removed condition")
+        self.undoManager?.registerUndo(withTarget: self, handler: { (Target) in
+         Target.saveGoal(derscription: self.tempGoalDescription, type: self.tempGoalType, completionValue: self.tempCompletionVal, progress: self.tempProgress)
+        })
+         self.undoManager?.undo()
+         fetchCoreDataObjects()
+         tableView.reloadData()
+         undoButtonHidden()
+    }
+    
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchCoreDataObjects()
         tableView.reloadData()
+        undoButtonShown()
     }
     func fetchCoreDataObjects() {
+        //let tempGoalCount = goals.count
         self.fetch { (complete) in
             if complete {
                 if goals.count >= 1 {
@@ -37,10 +71,12 @@ class GoalsVC: UIViewController {
                 }
                 else {
                     tableView.isHidden = true
+                    tempGoalDescription = ""
                 }
             }
         }
     }
+    
     @IBAction func addGoalBtnPressed(_ sender: Any) {
         guard let CreateGoalVC = storyboard?.instantiateViewController(identifier: "CreateGoalVC") else {
             return
@@ -91,6 +127,25 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
 }
 
 extension GoalsVC {
+    func saveGoal(derscription: String, type: String, completionValue: Int32, progress: Int32) {
+        guard let managedContext = appDelegate?.persistentContainer.viewContext else { return }
+        
+        let goal = Goal(context: managedContext)
+        
+        goal.goalDescription = derscription
+        goal.goalType = type
+        goal.goalCompletionValue = completionValue
+        goal.goalProgress = progress
+        
+        do {
+            try managedContext.save()
+            print("Successfully saved data.")
+            
+        } catch {
+            debugPrint("Could not save: \(error.localizedDescription)")
+            
+        }
+    }
     
     func setProgress(atIndexPath indexPath: IndexPath) {
         guard let managedContext = appDelegate?.persistentContainer.viewContext else { return }
@@ -112,15 +167,24 @@ extension GoalsVC {
     
     func removeGoal(atIndexPath indexPath: IndexPath) {
         guard let managedContext = appDelegate?.persistentContainer.viewContext else { return }
+        
+        tempGoalDescription = goals[indexPath.row].goalDescription
+        tempGoalType = goals[indexPath.row].goalType
+        tempCompletionVal = goals[indexPath.row].goalCompletionValue
+        tempProgress = goals[indexPath.row].goalProgress
+        
         managedContext.delete(goals[indexPath.row])
         
         do {
             try managedContext.save()
+            undoButtonShown()
+            goalStatus.text = "Goal Removed"
             print("success removal")
         } catch {
             debugPrint("Could not remove: \(error)")
         }
     }
+    
     
     func fetch(completion: (_ complete: Bool) -> ()) {
         guard let managedContext = appDelegate?.persistentContainer.viewContext else { return }
