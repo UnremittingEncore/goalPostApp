@@ -23,6 +23,7 @@ class CreateGoalVC: UIViewController {
         nextBtn.bindToKeyboard()
         shortTermBtn.setSelectedColor()
         longTermBtn.setDeselectedColor()
+        goalTextView.delegate = self
         // Do any additional setup after loading the view.
     }
     @IBAction func shortTermBtnPressed(_ sender: Any) {
@@ -36,10 +37,21 @@ class CreateGoalVC: UIViewController {
         longTermBtn.setSelectedColor()
     }
     @IBAction func nextBtnPressed(_ sender: Any) {
-        
+        if goalTextView.text != "" && goalTextView.text != "What is your goal?" {
+            guard let finishGoalVC = storyboard?.instantiateViewController(identifier: "FinishGoalVC") as? FinishGoalVC else { return }
+            finishGoalVC.initData(description: goalTextView.text, type: goalType)
+            presentingViewController?.presentSecondaryDetail(finishGoalVC)
+        }
     }
     @IBAction func backBtnWasPressed(_ sender: Any) {
         dismissDetail()
     }
     
+}
+
+extension  CreateGoalVC: UITextViewDelegate {
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        goalTextView.text = ""
+        goalTextView.textColor = UIColor.black
+    }
 }
