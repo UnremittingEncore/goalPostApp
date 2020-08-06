@@ -60,7 +60,6 @@ class GoalsVC: UIViewController {
         super.viewWillAppear(animated)
         fetchCoreDataObjects()
         tableView.reloadData()
-        undoButtonShown()
     }
     func fetchCoreDataObjects() {
         //let tempGoalCount = goals.count
