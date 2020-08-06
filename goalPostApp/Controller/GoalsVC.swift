@@ -173,7 +173,7 @@ extension GoalsVC {
             if flag = anything else(say 2 here) -> reset progress to 0
          */
         if flag == 0 {
-            if chosenGoal.goalProgress <= chosenGoal.goalCompletionValue {
+            if chosenGoal.goalProgress < chosenGoal.goalCompletionValue {
                 chosenGoal.goalProgress += 1
             }
             else {
