@@ -14,7 +14,7 @@ let appDelegate = UIApplication.shared.delegate as? AppDelegate
 class GoalsVC: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var goalStatus: UILabel! // tells us if a goal is added or removed
+    @IBOutlet weak var goalStatus: UILabel! 
     @IBOutlet weak var undoBtn: UIButton!
     @IBOutlet weak var undoLbl: UILabel!
     
