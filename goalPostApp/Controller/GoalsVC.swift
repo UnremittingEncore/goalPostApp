@@ -109,18 +109,36 @@ extension GoalsVC: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .none
     }
+    func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+       
+        let resetAction = UIContextualAction(style: .normal, title: "RESET") { (action, view, nil) in
+            self.setProgress(atIndexPath: indexPath, flag: 2)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+        }
+        let removeAction = UIContextualAction(style: .normal, title: "-1") { (action, view, nil) in
+            self.setProgress(atIndexPath: indexPath, flag: 1)
+            tableView.reloadRows(at: [indexPath], with: .automatic)
+            
+        }
+        resetAction.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
+       
+        removeAction.backgroundColor = #colorLiteral(red: 0.06774160893, green: 0.2751933062, blue: 0.3610305256, alpha: 1)
+        let configuration = UISwipeActionsConfiguration(actions: [resetAction, removeAction])
+        configuration.performsFirstActionWithFullSwipe = false// use this if you dont want full swipe
+        return configuration
+    }
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         let deleteAction = UITableViewRowAction(style: .destructive, title: "DELETE") { (rowAction, indexPath) in
             self.removeGoal(atIndexPath: indexPath)
             self.fetchCoreDataObjects()
             tableView.deleteRows(at: [indexPath], with: .automatic)
         }
-        let addAction = UITableViewRowAction(style: .normal, title: "ADD 1") { (rowAction, indexPath) in
-            self.setProgress(atIndexPath: indexPath)
-            tableView.reloadRows(at: [indexPath], with: .automatic)
-        }
-        deleteAction.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
+        let addAction =  UITableViewRowAction(style: .destructive, title: "+1") { (rowAction, indexPath) in
+                   self.setProgress(atIndexPath: indexPath, flag: 0)
+                   tableView.reloadRows(at: [indexPath], with: .automatic)
+               }
         addAction.backgroundColor = #colorLiteral(red: 0.9385011792, green: 0.7164435983, blue: 0.3331357837, alpha: 1)
+        deleteAction.backgroundColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
         return [deleteAction, addAction]
     }
 }
@@ -146,16 +164,34 @@ extension GoalsVC {
         }
     }
     
-    func setProgress(atIndexPath indexPath: IndexPath) {
+    func setProgress(atIndexPath indexPath: IndexPath, flag: Int) {
         guard let managedContext = appDelegate?.persistentContainer.viewContext else { return }
         let chosenGoal = goals[indexPath.row]
-        
-        if chosenGoal.goalProgress < chosenGoal.goalCompletionValue {
-            chosenGoal.goalProgress += 1
+        /*Flag guide
+            if Flag = 0 -> add progress
+            if Flag = 1 -> -1 progress
+            if flag = anything else(say 2 here) -> reset progress to 0
+         */
+        if flag == 0 {
+            if chosenGoal.goalProgress <= chosenGoal.goalCompletionValue {
+                chosenGoal.goalProgress += 1
+            }
+            else {
+                return
+            }
+        }
+        else if flag == 1 {
+            if chosenGoal.goalProgress <= chosenGoal.goalCompletionValue {
+                if chosenGoal.goalProgress > 0 {chosenGoal.goalProgress -= 1}
+            }
+            else {
+                return
+            }
         }
         else {
-            return
+            chosenGoal.goalProgress = 0
         }
+       
         do {
             try managedContext.save()
             print("success set progress")
